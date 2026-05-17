@@ -4,18 +4,24 @@ import 'package:flutter/material.dart';
 abstract final class AppTheme {
   static ThemeData light() {
     const primary = BrandColors.kAppPrimaryColor;
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: primary,
+      brightness: Brightness.light,
+      primary: PrimaryColor.base,
+      secondary: SecondaryColor.base,
+      error: ErrorColor.base,
+    ).copyWith(
+      surface: BrandColors.kSurfaceColor,
+      onSurface: NeutralColor.color8,
+      background: BrandColors.kBackgroundColor,
+      onBackground: BrandColors.kTextPrimaryColor,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
       scaffoldBackgroundColor: BrandColors.kBackgroundColor,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primary,
-        primary: PrimaryColor.base,
-        secondary: SecondaryColor.base,
-        error: ErrorColor.base,
-        surface: BrandColors.kSurfaceColor,
-        onSurface: NeutralColor.color8,
-      ),
+      colorScheme: colorScheme,
       appBarTheme: const AppBarTheme(
         backgroundColor: BrandColors.kSurfaceColor,
         foregroundColor: BrandColors.kTextPrimaryColor,
@@ -28,7 +34,7 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Shades.white,
+        fillColor: BrandColors.kSurfaceColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: NeutralColor.color2),
@@ -48,16 +54,22 @@ abstract final class AppTheme {
   }
 
   static ThemeData dark() {
+    const background = NeutralColor.color9;
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: PrimaryColor.base,
+      brightness: Brightness.dark,
+      primary: PrimaryColor.base,
+    ).copyWith(
+      surface: NeutralColor.color8,
+      background: background,
+      onBackground: Shades.white,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: NeutralColor.color9,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: PrimaryColor.base,
-        brightness: Brightness.dark,
-        primary: PrimaryColor.base,
-        surface: NeutralColor.color8,
-      ),
+      scaffoldBackgroundColor: background,
+      colorScheme: colorScheme,
       appBarTheme: const AppBarTheme(
         backgroundColor: NeutralColor.color8,
         foregroundColor: Shades.white,

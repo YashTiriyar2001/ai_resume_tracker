@@ -15,12 +15,20 @@ class AppCubit extends Cubit<AppState> {
   Future<void> load() async {
     final stored = _preferences.getString(StorageKeys.themeMode);
     final themeMode = _parseThemeMode(stored);
+    final onboardingComplete =
+        _preferences.getBool(StorageKeys.onboardingComplete) ?? false;
     emit(
       state.copyWith(
         themeMode: themeMode,
         status: AppStatus.ready,
+        onboardingComplete: onboardingComplete,
       ),
     );
+  }
+
+  Future<void> completeOnboarding() async {
+    emit(state.copyWith(onboardingComplete: true));
+    await _preferences.setBool(StorageKeys.onboardingComplete, true);
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {

@@ -22,11 +22,12 @@ void main() {
     }
   });
 
-  testWidgets('App renders title', (WidgetTester tester) async {
+  testWidgets('App shows onboarding on first launch', (WidgetTester tester) async {
     await tester.pumpWidget(const App());
     await tester.pumpAndSettle();
 
-    expect(find.text('AI Resume Tracker'), findsOneWidget);
-    expect(find.text('Welcome'), findsOneWidget);
+    expect(find.text('Welcome to ATSify 🔥'), findsOneWidget);
+    expect(find.text('Tired of your resume getting ghosted?'), findsOneWidget);
+    expect(find.text('Next'), findsOneWidget);
   });
 }

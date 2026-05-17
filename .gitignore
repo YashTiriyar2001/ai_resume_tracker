@@ -1,3 +1,6 @@
+# Local API keys (copy from secrets.example.dart)
+lib/core/config/secrets.dart
+
 # Miscellaneous
 *.class
 *.log
