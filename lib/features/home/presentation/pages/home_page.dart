@@ -1,11 +1,21 @@
-import 'package:custom_design_system/custom_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../app/cubit/app_cubit.dart';
+import '../../../analysis/domain/analysis_request.dart';
+import '../../../onboarding/presentation/widgets/ember_background.dart';
+import '../../../settings/presentation/pages/settings_tab.dart';
+import '../../data/resume_file_picker.dart';
+import '../../domain/roast_record.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
+import '../theme/home_theme.dart';
+import '../widgets/home_bottom_nav_bar.dart';
+import '../widgets/home_recent_roasts_section.dart';
+import '../widgets/home_stats_section.dart';
+import '../widgets/home_top_bar.dart';
+import '../widgets/home_upload_section.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,100 +25,227 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _nameController = TextEditingController();
+  HomeTab _selectedTab = HomeTab.home;
 
   @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    context.read<HomeBloc>().add(const HomeStarted());
+  }
+
+  Future<void> _startRoasting() async {
+    try {
+      final picked = await ResumeFilePicker.pickResume();
+      if (picked == null || !mounted) return;
+
+      await context.push(
+        '/analyze',
+        extra: AnalysisRequest(
+          sourcePath: picked.path,
+          fileName: picked.fileName,
+        ),
+      );
+
+      if (!mounted) return;
+      context.read<HomeBloc>().add(const HomeStarted());
+    } on UnsupportedError catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message ?? 'Unsupported file'),
+          backgroundColor: const Color(0xFFB71C1C),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString()),
+          backgroundColor: const Color(0xFFB71C1C),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const DsText(
-          'AI Resume Tracker',
-          type: TextType.Heading,
-          size: TextSize.L,
-          fontWeight: TextFontWeight.SemiBold,
-        ),
-        actions: [
-          IconButton(
-            tooltip: 'Toggle theme',
-            onPressed: () => _cycleTheme(context),
-            icon: const Icon(Icons.brightness_6_outlined),
+      backgroundColor: HomeTheme.background,
+      body: Stack(
+        children: [
+          const Positioned.fill(child: EmberBackground()),
+          SafeArea(
+            child: Column(
+              children: [
+                const HomeTopBar(),
+                Expanded(
+                  child: BlocBuilder<HomeBloc, HomeState>(
+                    builder: (context, state) {
+                      if (state.status == HomeStatus.loading &&
+                          state.roasts.isEmpty) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: HomeTheme.accent,
+                          ),
+                        );
+                      }
+
+                      return switch (_selectedTab) {
+                        HomeTab.home => _HomeTabBody(
+                            state: state,
+                            onStartRoasting: _startRoasting,
+                          ),
+                        HomeTab.history => _HistoryTab(roasts: state.roasts),
+                        HomeTab.settings => const SettingsTab(),
+                      };
+                    },
+                  ),
+                ),
+                HomeBottomNavBar(
+                  selected: _selectedTab,
+                  onSelected: (tab) => setState(() => _selectedTab = tab),
+                ),
+              ],
+            ),
           ),
         ],
       ),
-      body: BlocConsumer<HomeBloc, HomeState>(
-        listener: (context, state) {
-          if (state.displayName != _nameController.text) {
-            _nameController.text = state.displayName ?? '';
-          }
-        },
-        builder: (context, state) {
-          if (state.status == HomeStatus.loading &&
-              state.displayName == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    );
+  }
+}
 
-          return Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const DsText(
-                  'Welcome',
-                  type: TextType.Heading,
-                  size: TextSize.XL,
-                  fontWeight: TextFontWeight.Bold,
-                ),
-                const SizedBox(height: 8),
-                DsText(
-                  state.displayName == null
-                      ? 'Set a display name — stored locally with Hive.'
-                      : 'Hello, ${state.displayName}!',
-                  textColor: NeutralColor.color6,
-                ),
-                const SizedBox(height: 24),
-                DsTextField(
-                  controller: _nameController,
-                  inputHintText: 'Display name',
-                ),
-                const SizedBox(height: 16),
-                DsButton.primary(
-                  'Save name',
-                  onPressed: () {
-                    context.read<HomeBloc>().add(
-                          HomeDisplayNameChanged(_nameController.text),
-                        );
-                  },
-                ),
-                if (state.status == HomeStatus.failure &&
-                    state.errorMessage != null) ...[
-                  const SizedBox(height: 16),
-                  DsText(
-                    state.errorMessage!,
-                    textColor: ErrorColor.base,
-                  ),
-                ],
-              ],
-            ),
-          );
-        },
+class _HomeTabBody extends StatelessWidget {
+  const _HomeTabBody({
+    required this.state,
+    required this.onStartRoasting,
+  });
+
+  final HomeState state;
+  final VoidCallback onStartRoasting;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          HomeUploadSection(
+            userName: state.greetingName,
+            onStartRoasting: onStartRoasting,
+          ),
+          HomeStatsSection(
+            totalRoasts: state.totalRoasts,
+            averageScore: state.averageScore,
+            fastestAnalysisLabel: state.fastestAnalysisLabel,
+          ),
+          HomeRecentRoastsSection(roasts: state.recentRoasts),
+          const SizedBox(height: 16),
+        ],
       ),
     );
   }
+}
 
-  void _cycleTheme(BuildContext context) {
-    final cubit = context.read<AppCubit>();
-    final current = cubit.state.themeMode;
-    final next = switch (current) {
-      ThemeMode.system => ThemeMode.light,
-      ThemeMode.light => ThemeMode.dark,
-      ThemeMode.dark => ThemeMode.system,
-    };
-    cubit.setThemeMode(next);
+class _HistoryTab extends StatelessWidget {
+  const _HistoryTab({required this.roasts});
+
+  final List<RoastRecord> roasts;
+
+  @override
+  Widget build(BuildContext context) {
+    if (roasts.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: Text(
+            'No roasts yet. Upload a resume from Home.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: HomeTheme.body,
+              fontSize: 15,
+              height: 1.4,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+      itemCount: roasts.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        final roast = roasts[index];
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => context.push('/result/${roast.id}'),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: HomeTheme.surfaceElevated,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: HomeTheme.border),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          roast.fileName,
+                          style: const TextStyle(
+                            color: HomeTheme.headline,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'ATS Score: ${roast.score} • 🔥 ${roast.roastLevel}',
+                          style: const TextStyle(
+                            color: HomeTheme.muted,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          roast.timeAgoLabel,
+                          style: const TextStyle(
+                            color: HomeTheme.muted,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: roast.scoreColor.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: roast.scoreColor.withValues(alpha: 0.45),
+                      ),
+                    ),
+                    child: Text(
+                      '${roast.score}/100',
+                      style: TextStyle(
+                        color: roast.scoreColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

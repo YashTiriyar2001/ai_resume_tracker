@@ -9,4 +9,5 @@ abstract final class HiveBoxNames {
 
 abstract final class HiveKeys {
   static const String displayName = 'display_name';
+  static const String roasts = 'roasts';
 }

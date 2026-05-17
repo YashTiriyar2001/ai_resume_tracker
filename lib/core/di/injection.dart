@@ -1,8 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../features/analysis/data/resume_analysis_service.dart';
 import '../../features/app/cubit/app_cubit.dart';
+import '../../features/home/data/roast_repository.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
+import '../services/gemini_service.dart';
+import '../services/resume_text_extractor.dart';
 import '../storage/hive_service.dart';
 import '../storage/preferences_service.dart';
 
@@ -21,11 +25,29 @@ Future<void> configureDependencies({String? hiveDirectoryPath}) async {
   }
   getIt.registerSingleton<HiveService>(hiveService);
 
+  getIt.registerLazySingleton<ResumeTextExtractor>(ResumeTextExtractor.new);
+  getIt.registerLazySingleton<GeminiService>(GeminiService.new);
+
+  getIt.registerLazySingleton<RoastRepository>(
+    () => RoastRepository(hiveService: getIt<HiveService>()),
+  );
+
+  getIt.registerLazySingleton<ResumeAnalysisService>(
+    () => ResumeAnalysisService(
+      textExtractor: getIt<ResumeTextExtractor>(),
+      geminiService: getIt<GeminiService>(),
+      roastRepository: getIt<RoastRepository>(),
+    ),
+  );
+
   getIt.registerFactory<AppCubit>(
     () => AppCubit(preferences: getIt<PreferencesService>()),
   );
 
   getIt.registerFactory<HomeBloc>(
-    () => HomeBloc(hiveService: getIt<HiveService>()),
+    () => HomeBloc(
+      hiveService: getIt<HiveService>(),
+      roastRepository: getIt<RoastRepository>(),
+    ),
   );
 }
