@@ -1,0 +1,31 @@
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../features/app/cubit/app_cubit.dart';
+import '../../features/home/presentation/bloc/home_bloc.dart';
+import '../storage/hive_service.dart';
+import '../storage/preferences_service.dart';
+
+final GetIt getIt = GetIt.instance;
+
+Future<void> configureDependencies({String? hiveDirectoryPath}) async {
+  final prefs = await SharedPreferences.getInstance();
+  getIt.registerSingleton<SharedPreferences>(prefs);
+  getIt.registerSingleton<PreferencesService>(PreferencesService(prefs));
+
+  final hiveService = HiveService();
+  if (hiveDirectoryPath != null) {
+    await hiveService.initAtPath(hiveDirectoryPath);
+  } else {
+    await hiveService.init();
+  }
+  getIt.registerSingleton<HiveService>(hiveService);
+
+  getIt.registerFactory<AppCubit>(
+    () => AppCubit(preferences: getIt<PreferencesService>()),
+  );
+
+  getIt.registerFactory<HomeBloc>(
+    () => HomeBloc(hiveService: getIt<HiveService>()),
+  );
+}
