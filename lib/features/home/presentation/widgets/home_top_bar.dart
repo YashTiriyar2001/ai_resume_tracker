@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../theme/home_theme.dart';
+import '../../../../core/theme/app_palette.dart';
 
 class HomeTopBar extends StatelessWidget {
   const HomeTopBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 12, 0),
       child: Row(
@@ -34,22 +36,13 @@ class HomeTopBar extends StatelessWidget {
               ),
             ),
           ),
-          const Text(
+          Text(
             'ify',
             style: TextStyle(
-              color: HomeTheme.headline,
+              color: colors.headline,
               fontSize: 22,
               fontWeight: FontWeight.w300,
               height: 1,
-            ),
-          ),
-          const Spacer(),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.notifications_none_rounded,
-              color: HomeTheme.headline,
-              size: 26,
             ),
           ),
         ],

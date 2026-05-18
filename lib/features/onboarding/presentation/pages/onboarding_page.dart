@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_palette.dart';
 import '../../../app/cubit/app_cubit.dart';
 import '../../domain/onboarding_slide.dart';
-import '../theme/onboarding_theme.dart';
 import '../widgets/ember_background.dart';
 import '../widgets/onboarding_gradient_button.dart';
 import '../widgets/onboarding_page_indicator.dart';
@@ -25,20 +25,25 @@ class _OnboardingPageState extends State<OnboardingPage> {
   void initState() {
     super.initState();
     _pageController = PageController();
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: OnboardingTheme.background,
-        systemNavigationBarIconBrightness: Brightness.light,
-      ),
-    );
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _applySystemUi(AppPalette colors) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarBrightness: colors.isDark ? Brightness.dark : Brightness.light,
+        statusBarIconBrightness:
+            colors.isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: colors.background,
+        systemNavigationBarIconBrightness:
+            colors.isDark ? Brightness.light : Brightness.dark,
+      ),
+    );
   }
 
   void _onNext() {
@@ -58,11 +63,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
+    _applySystemUi(colors);
+
     final slide = onboardingSlides[_currentPage];
     final bottomPadding = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
-      backgroundColor: OnboardingTheme.background,
+      backgroundColor: colors.background,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -80,8 +88,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             child: TextButton(
                               onPressed: _onSkip,
                               style: TextButton.styleFrom(
-                                backgroundColor: const Color(0xFF2A2A2A),
-                                foregroundColor: Colors.white,
+                                backgroundColor: colors.surfaceElevated,
+                                foregroundColor: colors.headline,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                   vertical: 8,

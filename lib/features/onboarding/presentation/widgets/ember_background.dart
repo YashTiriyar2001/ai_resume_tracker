@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_palette.dart';
+
 /// Scattered glowing ember particles behind onboarding content.
 class EmberBackground extends StatelessWidget {
   const EmberBackground({super.key});
@@ -21,6 +23,7 @@ class EmberBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final emberIntensity = context.appPalette.emberIntensity;
     return LayoutBuilder(
       builder: (context, constraints) {
         return CustomPaint(
@@ -28,6 +31,7 @@ class EmberBackground extends StatelessWidget {
           painter: _EmberPainter(
             particles: _particles,
             seed: constraints.maxWidth.hashCode,
+            emberIntensity: emberIntensity,
           ),
         );
       },
@@ -45,24 +49,31 @@ class _Particle {
 }
 
 class _EmberPainter extends CustomPainter {
-  _EmberPainter({required this.particles, required this.seed});
+  _EmberPainter({
+    required this.particles,
+    required this.seed,
+    required this.emberIntensity,
+  });
 
   final List<_Particle> particles;
   final int seed;
+  final double emberIntensity;
 
   @override
   void paint(Canvas canvas, Size size) {
     final random = math.Random(seed);
+    final intensity = emberIntensity;
     for (final particle in particles) {
       final center = Offset(
         particle.x * size.width,
         particle.y * size.height,
       );
       final glowRadius = particle.radius * (2.2 + random.nextDouble());
+      final opacity = particle.opacity * intensity;
       final paint = Paint()
         ..shader = RadialGradient(
           colors: [
-            Color(0xFFFF8C00).withValues(alpha: particle.opacity),
+            Color(0xFFFF8C00).withValues(alpha: opacity),
             Color(0xFFFF8C00).withValues(alpha: 0),
           ],
         ).createShader(
@@ -72,11 +83,12 @@ class _EmberPainter extends CustomPainter {
       canvas.drawCircle(
         center,
         particle.radius,
-        Paint()..color = Color(0xFFFFB74D).withValues(alpha: particle.opacity),
+        Paint()..color = Color(0xFFFFB74D).withValues(alpha: opacity),
       );
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _EmberPainter oldDelegate) =>
+      oldDelegate.emberIntensity != emberIntensity;
 }

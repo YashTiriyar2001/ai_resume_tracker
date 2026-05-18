@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/home_theme.dart';
+import '../../../../core/theme/app_palette.dart';
 
 class HomeStatsSection extends StatelessWidget {
   const HomeStatsSection({
@@ -16,6 +16,7 @@ class HomeStatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
     final avgLabel = averageScore == null ? '—' : '$averageScore/100';
 
     return Padding(
@@ -23,9 +24,9 @@ class HomeStatsSection extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
         decoration: BoxDecoration(
-          color: HomeTheme.surface.withValues(alpha: 0.9),
+          color: colors.surface.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: HomeTheme.border),
+          border: Border.all(color: colors.border),
         ),
         child: Row(
           children: [
@@ -35,14 +36,14 @@ class HomeStatsSection extends StatelessWidget {
                 value: '$totalRoasts ✨',
               ),
             ),
-            const _StatDivider(),
+            _StatDivider(color: colors.border),
             Expanded(
               child: _StatItem(
                 label: 'Avg ATS Score',
                 value: avgLabel,
               ),
             ),
-            const _StatDivider(),
+            _StatDivider(color: colors.border),
             Expanded(
               child: _StatItem(
                 label: 'Fastest Analysis',
@@ -57,14 +58,16 @@ class HomeStatsSection extends StatelessWidget {
 }
 
 class _StatDivider extends StatelessWidget {
-  const _StatDivider();
+  const _StatDivider({required this.color});
+
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 1,
       height: 40,
-      color: HomeTheme.border,
+      color: color,
     );
   }
 }
@@ -80,13 +83,15 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
+
     return Column(
       children: [
         Text(
           label,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: HomeTheme.muted,
+          style: TextStyle(
+            color: colors.muted,
             fontSize: 11,
             fontWeight: FontWeight.w500,
           ),
@@ -95,8 +100,8 @@ class _StatItem extends StatelessWidget {
         Text(
           value,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: HomeTheme.statValue,
+          style: TextStyle(
+            color: colors.statValue,
             fontSize: 15,
             fontWeight: FontWeight.w700,
           ),

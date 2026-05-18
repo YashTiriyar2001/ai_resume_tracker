@@ -4,23 +4,31 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../app/cubit/app_cubit.dart';
 import '../../../home/data/roast_repository.dart';
 import '../../../home/presentation/bloc/home_bloc.dart';
 import '../../../home/presentation/bloc/home_event.dart';
-import '../../../home/presentation/theme/home_theme.dart';
 
 class SettingsTab extends StatelessWidget {
   const SettingsTab({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
     final themeMode = context.watch<AppCubit>().state.themeMode;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       children: [
-        Text('Settings', style: GoogleFonts.poppins(color: HomeTheme.headline, fontSize: 22, fontWeight: FontWeight.w700)),
+        Text(
+          'Settings',
+          style: GoogleFonts.poppins(
+            color: colors.headline,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         const SizedBox(height: 20),
         _SettingsTile(
           icon: Icons.dark_mode_outlined,
@@ -28,7 +36,7 @@ class SettingsTab extends StatelessWidget {
           subtitle: _themeLabel(themeMode),
           trailing: Switch.adaptive(
             value: themeMode == ThemeMode.dark,
-            activeThumbColor: HomeTheme.accent,
+            activeThumbColor: colors.accent,
             onChanged: (enabled) {
               context.read<AppCubit>().setThemeMode(
                     enabled ? ThemeMode.dark : ThemeMode.light,
@@ -40,7 +48,7 @@ class SettingsTab extends StatelessWidget {
           icon: Icons.key_outlined,
           title: 'Gemini API',
           subtitle: AppConfig.hasGeminiApiKey
-              ? 'gemini-2.0-flash (REST API)'
+              ? 'gemini-2.5-flash-lite (SDK)'
               : 'Using local fallback analysis',
         ),
         _SettingsTile(
@@ -50,16 +58,20 @@ class SettingsTab extends StatelessWidget {
           onTap: () async {
             final confirmed = await showDialog<bool>(
               context: context,
-              builder: (context) => AlertDialog(
-                backgroundColor: HomeTheme.surface,
-                title: const Text('Clear history?', style: TextStyle(color: HomeTheme.headline)),
+              builder: (dialogContext) => AlertDialog(
+                title: const Text('Clear history?'),
                 content: const Text(
                   'This deletes all roast results from this device.',
-                  style: TextStyle(color: HomeTheme.body),
                 ),
                 actions: [
-                  TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                  TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Clear')),
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext, false),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext, true),
+                    child: const Text('Clear'),
+                  ),
                 ],
               ),
             );
@@ -117,19 +129,31 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: HomeTheme.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: HomeTheme.border),
+        border: Border.all(color: colors.border),
       ),
       child: ListTile(
         onTap: onTap,
-        leading: Icon(icon, color: HomeTheme.accent),
-        title: Text(title, style: GoogleFonts.inter(color: HomeTheme.headline, fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle, style: GoogleFonts.inter(color: HomeTheme.muted, fontSize: 12)),
-        trailing: trailing ?? (onTap != null ? const Icon(Icons.chevron_right, color: HomeTheme.muted) : null),
+        leading: Icon(icon, color: colors.accent),
+        title: Text(
+          title,
+          style: GoogleFonts.inter(
+            color: colors.headline,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: GoogleFonts.inter(color: colors.muted, fontSize: 12),
+        ),
+        trailing: trailing ??
+            (onTap != null ? Icon(Icons.chevron_right, color: colors.muted) : null),
       ),
     );
   }

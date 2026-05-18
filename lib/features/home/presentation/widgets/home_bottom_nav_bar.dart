@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/home_theme.dart';
+import '../../../../core/theme/app_palette.dart';
 
 enum HomeTab { home, history, settings }
 
@@ -16,16 +16,21 @@ class HomeBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
+    final shadowColor = colors.isDark
+        ? Colors.black.withValues(alpha: 0.4)
+        : Colors.black.withValues(alpha: 0.08);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E).withValues(alpha: 0.95),
+          color: colors.navBar.withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: HomeTheme.border),
+          border: Border.all(color: colors.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
+              color: shadowColor,
               blurRadius: 24,
               offset: const Offset(0, -4),
             ),
@@ -76,7 +81,8 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? HomeTheme.accent : HomeTheme.muted;
+    final colors = context.appPalette;
+    final color = isSelected ? colors.accent : colors.muted;
 
     return Expanded(
       child: Material(

@@ -26,13 +26,13 @@ class OnboardingPageIndicator extends StatelessWidget {
           height: isActive ? 10 : 8,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isActive ? OnboardingTheme.dotActive : null,
+            color: isActive ? OnboardingTheme.dotActive(context) : null,
             border: isActive
                 ? null
                 : Border.all(
                     color: index == 0 && currentIndex > 0
-                        ? OnboardingTheme.dotInactiveOutline
-                        : OnboardingTheme.dotInactive,
+                        ? OnboardingTheme.dotInactiveOutline(context)
+                        : OnboardingTheme.dotInactive(context),
                     width: 1.5,
                   ),
           ),

@@ -22,7 +22,7 @@ class OnboardingSlideView extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               slide.header!,
-              style: OnboardingTheme.headerStyle,
+              style: OnboardingTheme.headerStyle(context),
               textAlign: TextAlign.center,
             ),
           ],
@@ -34,13 +34,13 @@ class OnboardingSlideView extends StatelessWidget {
           ),
           Text(
             slide.title,
-            style: OnboardingTheme.titleStyle,
+            style: OnboardingTheme.titleStyle(context),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           Text(
             slide.subtitle,
-            style: OnboardingTheme.subtitleStyle,
+            style: OnboardingTheme.subtitleStyle(context),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),

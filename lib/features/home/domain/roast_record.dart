@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 
 import '../../analysis/domain/ats_analysis_result.dart';
 
@@ -16,6 +17,7 @@ class RoastRecord extends Equatable {
     required this.missingKeywords,
     required this.roasts,
     required this.suggestions,
+    this.mimeType,
     this.analysisDurationMs,
     this.isSaved = false,
   });
@@ -23,6 +25,7 @@ class RoastRecord extends Equatable {
   final String id;
   final String fileName;
   final String filePath;
+  final String? mimeType;
   final int score;
   final DateTime createdAt;
   final String roastLevel;
@@ -41,12 +44,14 @@ class RoastRecord extends Equatable {
     required AtsAnalysisResult analysis,
     required DateTime createdAt,
     int? analysisDurationMs,
+    String? mimeType,
     bool isSaved = false,
   }) {
     return RoastRecord(
       id: id,
       fileName: fileName,
       filePath: filePath,
+      mimeType: mimeType,
       score: analysis.atsScore,
       createdAt: createdAt,
       roastLevel: analysis.roastLevel,
@@ -64,6 +69,7 @@ class RoastRecord extends Equatable {
         'id': id,
         'fileName': fileName,
         'filePath': filePath,
+        if (mimeType != null) 'mimeType': mimeType,
         'score': score,
         'createdAt': createdAt.toIso8601String(),
         'roastLevel': roastLevel,
@@ -81,6 +87,7 @@ class RoastRecord extends Equatable {
       id: map['id'] as String,
       fileName: map['fileName'] as String,
       filePath: map['filePath'] as String,
+      mimeType: map['mimeType'] as String?,
       score: (map['score'] as num).toInt(),
       createdAt: DateTime.parse(map['createdAt'] as String),
       roastLevel: map['roastLevel'] as String? ?? 'Medium Rare',
@@ -101,6 +108,7 @@ class RoastRecord extends Equatable {
       id: id,
       fileName: fileName,
       filePath: filePath,
+      mimeType: mimeType,
       score: score,
       createdAt: createdAt,
       roastLevel: roastLevel,
@@ -112,6 +120,23 @@ class RoastRecord extends Equatable {
       analysisDurationMs: analysisDurationMs,
       isSaved: isSaved ?? this.isSaved,
     );
+  }
+
+  String get fileExtension => p.extension(fileName).toLowerCase();
+
+  String get fileExtensionLabel {
+    final ext = fileExtension.replaceFirst('.', '').toUpperCase();
+    return ext.isEmpty ? 'Document' : ext;
+  }
+
+  IconData get documentIcon {
+    return switch (fileExtension) {
+      '.pdf' => Icons.picture_as_pdf_outlined,
+      '.doc' || '.docx' => Icons.article_outlined,
+      '.txt' => Icons.text_snippet_outlined,
+      '.jpg' || '.jpeg' || '.png' => Icons.image_outlined,
+      _ => Icons.description_outlined,
+    };
   }
 
   static List<String> _readStringList(dynamic value) {
@@ -157,6 +182,7 @@ class RoastRecord extends Equatable {
         id,
         fileName,
         filePath,
+        mimeType,
         score,
         createdAt,
         roastLevel,

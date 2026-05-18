@@ -37,11 +37,13 @@ class RoastRepository {
     required String filePath,
     required AtsAnalysisResult analysis,
     required int analysisDurationMs,
+    String? mimeType,
   }) async {
     final roast = RoastRecord.fromAnalysis(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       fileName: fileName,
       filePath: filePath,
+      mimeType: mimeType ?? mimeTypeForFileName(fileName),
       analysis: analysis,
       createdAt: DateTime.now(),
       analysisDurationMs: analysisDurationMs,
@@ -71,8 +73,22 @@ class RoastRepository {
       ),
     );
 
-    await File(sourcePath).copy(destination.path);
+    final bytes = await File(sourcePath).readAsBytes();
+    await destination.writeAsBytes(bytes, flush: true);
     return destination.path;
+  }
+
+  static String? mimeTypeForFileName(String fileName) {
+    return switch (p.extension(fileName).toLowerCase()) {
+      '.pdf' => 'application/pdf',
+      '.doc' => 'application/msword',
+      '.docx' =>
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      '.txt' => 'text/plain',
+      '.jpg' || '.jpeg' => 'image/jpeg',
+      '.png' => 'image/png',
+      _ => null,
+    };
   }
 
   Future<void> toggleSaved(String id) async {
@@ -85,7 +101,18 @@ class RoastRepository {
   }
 
   Future<void> clearAll() async {
+    final roasts = await fetchRoasts();
+    for (final roast in roasts) {
+      await deleteDocumentFile(roast.filePath);
+    }
     await _hiveService.appBox.delete(HiveKeys.roasts);
+  }
+
+  Future<void> deleteDocumentFile(String filePath) async {
+    final file = File(filePath);
+    if (await file.exists()) {
+      await file.delete();
+    }
   }
 
   Future<void> _saveRoasts(List<RoastRecord> roasts) async {

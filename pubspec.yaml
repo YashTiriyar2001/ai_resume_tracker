@@ -23,6 +23,8 @@ dependencies:
   path: ^1.9.1
   file_selector: ^1.0.3
   go_router: ^14.8.1
+  google_generative_ai: ^0.4.7
+  cronet_http: ^1.8.0
   http: ^1.4.0
   syncfusion_flutter_pdf: ^28.2.12
   docx_to_text: ^1.0.1
@@ -30,6 +32,7 @@ dependencies:
   flutter_animate: ^4.5.2
   google_fonts: ^6.2.1
   share_plus: ^10.1.4
+  open_filex: ^4.7.0
 
   custom_design_system:
     path: ../custom_design_system
@@ -51,5 +54,6 @@ flutter:
 
   assets:
     - assets/app_icon.png
+    - assets/scan_files.gif
     - assets/home/
     - assets/onboarding/

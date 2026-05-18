@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/analysis/data/resume_analysis_service.dart';
 import '../../features/app/cubit/app_cubit.dart';
+import '../../features/home/data/resume_document_service.dart';
 import '../../features/home/data/roast_repository.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../services/gemini_service.dart';
@@ -27,6 +28,7 @@ Future<void> configureDependencies({String? hiveDirectoryPath}) async {
 
   getIt.registerLazySingleton<ResumeTextExtractor>(ResumeTextExtractor.new);
   getIt.registerLazySingleton<GeminiService>(GeminiService.new);
+  getIt.registerLazySingleton<ResumeDocumentService>(ResumeDocumentService.new);
 
   getIt.registerLazySingleton<RoastRepository>(
     () => RoastRepository(hiveService: getIt<HiveService>()),

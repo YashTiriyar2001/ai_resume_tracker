@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_palette.dart';
 import '../theme/home_theme.dart';
 
 abstract final class HomeAssets {
@@ -18,6 +19,8 @@ class HomeUploadSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Column(
@@ -25,18 +28,18 @@ class HomeUploadSection extends StatelessWidget {
         children: [
           Text(
             'Hey $userName 🔥, ready to get ATSified? ✨',
-            style: HomeTheme.greetingStyle,
+            style: HomeTheme.greetingStyle(context),
           ),
           const SizedBox(height: 24),
           Container(
             padding: const EdgeInsets.fromLTRB(20, 28, 20, 24),
             decoration: BoxDecoration(
-              color: HomeTheme.surface.withValues(alpha: 0.85),
+              color: colors.surface.withValues(alpha: 0.85),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: HomeTheme.border),
+              border: Border.all(color: colors.border),
               boxShadow: [
                 BoxShadow(
-                  color: HomeTheme.accent.withValues(alpha: 0.12),
+                  color: colors.accent.withValues(alpha: 0.12),
                   blurRadius: 32,
                   spreadRadius: -4,
                 ),
@@ -51,21 +54,21 @@ class HomeUploadSection extends StatelessWidget {
                   filterQuality: FilterQuality.high,
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'UPLOAD YOUR RESUME',
                   style: TextStyle(
-                    color: HomeTheme.headline,
+                    color: colors.headline,
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.8,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'PDF, DOCX, TXT, or photo • Tap or drag & drop',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: HomeTheme.body,
+                    color: colors.body,
                     fontSize: 13,
                     height: 1.4,
                   ),
@@ -88,12 +91,14 @@ class _StartRoastingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
+
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: HomeTheme.accent.withValues(alpha: 0.35),
+            color: colors.accent.withValues(alpha: 0.35),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -107,14 +112,14 @@ class _StartRoastingButton extends StatelessWidget {
           child: Ink(
             height: 56,
             decoration: BoxDecoration(
-              gradient: HomeTheme.primaryButton,
+              gradient: colors.primaryButton,
               borderRadius: BorderRadius.circular(32),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
                 'START ROASTING →',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: colors.onAccentButton,
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.4,

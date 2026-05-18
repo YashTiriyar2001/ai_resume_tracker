@@ -41,7 +41,7 @@ class AppCubit extends Cubit<AppState> {
       'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
       'system' => ThemeMode.system,
-      _ => ThemeMode.system,
+      _ => ThemeMode.dark,
     };
   }
 }

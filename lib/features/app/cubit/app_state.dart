@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class AppState extends Equatable {
   const AppState({
-    this.themeMode = ThemeMode.system,
+    this.themeMode = ThemeMode.dark,
     this.status = AppStatus.initial,
     this.onboardingComplete = false,
   });

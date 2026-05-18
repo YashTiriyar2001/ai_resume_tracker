@@ -49,6 +49,7 @@ class ResumeAnalysisService {
     return _roastRepository.saveAnalysis(
       fileName: fileName,
       filePath: persistedPath,
+      mimeType: RoastRepository.mimeTypeForFileName(fileName),
       analysis: analysis,
       analysisDurationMs: stopwatch.elapsedMilliseconds,
     );

@@ -1,80 +1,117 @@
-import 'package:custom_design_system/custom_design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'app_palette.dart';
 
 abstract final class AppTheme {
-  static ThemeData light() {
-    const primary = BrandColors.kAppPrimaryColor;
+  static ThemeData light() => _buildTheme(
+        brightness: Brightness.light,
+        palette: AppPalette.light,
+        scaffoldBackground: AppPalette.light.background,
+        appBarBackground: AppPalette.light.surface,
+        appBarForeground: AppPalette.light.headline,
+        inputFill: AppPalette.light.surface,
+        inputBorder: AppPalette.light.border,
+        divider: AppPalette.light.border,
+      );
+
+  static ThemeData dark() => _buildTheme(
+        brightness: Brightness.dark,
+        palette: AppPalette.dark,
+        scaffoldBackground: AppPalette.dark.background,
+        appBarBackground: AppPalette.dark.surface,
+        appBarForeground: AppPalette.dark.headline,
+        inputFill: AppPalette.dark.surfaceElevated,
+        inputBorder: AppPalette.dark.border,
+        divider: AppPalette.dark.border,
+      );
+
+  static ThemeData _buildTheme({
+    required Brightness brightness,
+    required AppPalette palette,
+    required Color scaffoldBackground,
+    required Color appBarBackground,
+    required Color appBarForeground,
+    required Color inputFill,
+    required Color inputBorder,
+    required Color divider,
+  }) {
+    final isDark = brightness == Brightness.dark;
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: primary,
-      brightness: Brightness.light,
-      primary: PrimaryColor.base,
-      secondary: SecondaryColor.base,
-      error: ErrorColor.base,
-    ).copyWith(
-      surface: BrandColors.kSurfaceColor,
-      onSurface: NeutralColor.color8,
-      background: BrandColors.kBackgroundColor,
-      onBackground: BrandColors.kTextPrimaryColor,
+      seedColor: palette.accent,
+      brightness: brightness,
+      primary: palette.accent,
+      surface: palette.surface,
+      onSurface: palette.headline,
     );
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
-      scaffoldBackgroundColor: BrandColors.kBackgroundColor,
+      brightness: brightness,
+      scaffoldBackgroundColor: scaffoldBackground,
       colorScheme: colorScheme,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: BrandColors.kSurfaceColor,
-        foregroundColor: BrandColors.kTextPrimaryColor,
+      extensions: [palette],
+      appBarTheme: AppBarTheme(
+        backgroundColor: appBarBackground,
+        foregroundColor: appBarForeground,
         elevation: 0,
         centerTitle: true,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+          statusBarIconBrightness:
+              isDark ? Brightness.light : Brightness.dark,
+          systemNavigationBarColor: palette.background,
+          systemNavigationBarIconBrightness:
+              isDark ? Brightness.light : Brightness.dark,
+        ),
       ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: PrimaryColor.base,
-        foregroundColor: Shades.white,
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: palette.accent,
+        foregroundColor: palette.onAccentButton,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: palette.accent,
+          foregroundColor: palette.onAccentButton,
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: BrandColors.kSurfaceColor,
+        fillColor: inputFill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: NeutralColor.color2),
+          borderSide: BorderSide(color: inputBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: NeutralColor.color2),
+          borderSide: BorderSide(color: inputBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: PrimaryColor.base, width: 2),
+          borderSide: BorderSide(color: palette.accent, width: 2),
         ),
       ),
-      dividerColor: NeutralColor.color2,
-      fontFamily: 'Roboto',
-    );
-  }
-
-  static ThemeData dark() {
-    const background = NeutralColor.color9;
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: PrimaryColor.base,
-      brightness: Brightness.dark,
-      primary: PrimaryColor.base,
-    ).copyWith(
-      surface: NeutralColor.color8,
-      background: background,
-      onBackground: Shades.white,
-    );
-
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      scaffoldBackgroundColor: background,
-      colorScheme: colorScheme,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: NeutralColor.color8,
-        foregroundColor: Shades.white,
-        elevation: 0,
-        centerTitle: true,
+      dividerColor: divider,
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: isDark ? palette.surfaceElevated : palette.headline,
+        contentTextStyle: TextStyle(color: isDark ? palette.headline : Colors.white),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: palette.surface,
+        titleTextStyle: TextStyle(
+          color: palette.headline,
+          fontWeight: FontWeight.w600,
+          fontSize: 18,
+        ),
+        contentTextStyle: TextStyle(color: palette.body, fontSize: 14),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return palette.accent;
+          }
+          return null;
+        }),
       ),
       fontFamily: 'Roboto',
     );

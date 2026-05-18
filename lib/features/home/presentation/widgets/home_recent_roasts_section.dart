@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_palette.dart';
 import '../../domain/roast_record.dart';
 import '../theme/home_theme.dart';
+import 'roast_document_actions.dart';
 
 class HomeRecentRoastsSection extends StatelessWidget {
   const HomeRecentRoastsSection({
@@ -23,24 +25,24 @@ class HomeRecentRoastsSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                Text('Recent Roasts', style: HomeTheme.sectionTitleStyle),
+                Text('Recent Roasts', style: HomeTheme.sectionTitleStyle(context)),
                 const Spacer(),
                 if (roasts.isNotEmpty)
                   Text(
                     '${roasts.length} shown',
-                    style: HomeTheme.linkStyle.copyWith(fontSize: 13),
+                    style: HomeTheme.linkStyle(context).copyWith(fontSize: 13),
                   ),
               ],
             ),
           ),
           const SizedBox(height: 14),
           if (roasts.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 'No roasts yet. Tap START ROASTING to upload your first resume.',
                 style: TextStyle(
-                  color: HomeTheme.body,
+                  color: context.appPalette.body,
                   fontSize: 14,
                   height: 1.4,
                 ),
@@ -48,7 +50,7 @@ class HomeRecentRoastsSection extends StatelessWidget {
             )
           else
             SizedBox(
-              height: 148,
+              height: 156,
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 scrollDirection: Axis.horizontal,
@@ -72,6 +74,8 @@ class _RecentRoastCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -81,9 +85,9 @@ class _RecentRoastCard extends StatelessWidget {
           width: 168,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: HomeTheme.surfaceElevated,
+            color: colors.surfaceElevated,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: HomeTheme.border),
+            border: Border.all(color: colors.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,21 +95,22 @@ class _RecentRoastCard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    Icons.description_outlined,
+                    roast.documentIcon,
                     size: 16,
-                    color: HomeTheme.muted.withValues(alpha: 0.9),
+                    color: colors.muted.withValues(alpha: 0.9),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       roast.timeAgoLabel,
-                      style: const TextStyle(
-                        color: HomeTheme.muted,
+                      style: TextStyle(
+                        color: colors.muted,
                         fontSize: 11,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  RoastDocumentIconButton(roast: roast),
                 ],
               ),
               const SizedBox(height: 8),
@@ -114,8 +119,8 @@ class _RecentRoastCard extends StatelessWidget {
                   roast.fileName,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: HomeTheme.headline,
+                  style: TextStyle(
+                    color: colors.headline,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     height: 1.3,
@@ -125,7 +130,7 @@ class _RecentRoastCard extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 '🔥 ${roast.roastLevel}',
-                style: const TextStyle(color: HomeTheme.body, fontSize: 11),
+                style: TextStyle(color: colors.body, fontSize: 11),
               ),
               const SizedBox(height: 6),
               Container(

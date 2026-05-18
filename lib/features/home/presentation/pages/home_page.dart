@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_palette.dart';
 import '../../../analysis/domain/analysis_request.dart';
 import '../../../onboarding/presentation/widgets/ember_background.dart';
 import '../../../settings/presentation/pages/settings_tab.dart';
@@ -10,12 +11,12 @@ import '../../domain/roast_record.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
-import '../theme/home_theme.dart';
 import '../widgets/home_bottom_nav_bar.dart';
 import '../widgets/home_recent_roasts_section.dart';
 import '../widgets/home_stats_section.dart';
 import '../widgets/home_top_bar.dart';
 import '../widgets/home_upload_section.dart';
+import '../widgets/roast_document_actions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,7 +48,7 @@ class _HomePageState extends State<HomePage> {
       );
 
       if (!mounted) return;
-      context.read<HomeBloc>().add(const HomeStarted());
+      context.read<HomeBloc>().add(const HomeRoastsRefreshed());
     } on UnsupportedError catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,8 +70,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
+
     return Scaffold(
-      backgroundColor: HomeTheme.background,
+      backgroundColor: colors.background,
       body: Stack(
         children: [
           const Positioned.fill(child: EmberBackground()),
@@ -83,9 +86,9 @@ class _HomePageState extends State<HomePage> {
                     builder: (context, state) {
                       if (state.status == HomeStatus.loading &&
                           state.roasts.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: CircularProgressIndicator(
-                            color: HomeTheme.accent,
+                            color: colors.accent,
                           ),
                         );
                       }
@@ -154,15 +157,17 @@ class _HistoryTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appPalette;
+
     if (roasts.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(32),
+          padding: const EdgeInsets.all(32),
           child: Text(
             'No roasts yet. Upload a resume from Home.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: HomeTheme.body,
+              color: colors.body,
               fontSize: 15,
               height: 1.4,
             ),
@@ -185,9 +190,9 @@ class _HistoryTab extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: HomeTheme.surfaceElevated,
+                color: colors.surfaceElevated,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: HomeTheme.border),
+                border: Border.all(color: colors.border),
               ),
               child: Row(
                 children: [
@@ -197,8 +202,8 @@ class _HistoryTab extends StatelessWidget {
                       children: [
                         Text(
                           roast.fileName,
-                          style: const TextStyle(
-                            color: HomeTheme.headline,
+                          style: TextStyle(
+                            color: colors.headline,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
@@ -206,39 +211,49 @@ class _HistoryTab extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           'ATS Score: ${roast.score} • 🔥 ${roast.roastLevel}',
-                          style: const TextStyle(
-                            color: HomeTheme.muted,
+                          style: TextStyle(
+                            color: colors.muted,
                             fontSize: 12,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           roast.timeAgoLabel,
-                          style: const TextStyle(
-                            color: HomeTheme.muted,
+                          style: TextStyle(
+                            color: colors.muted,
                             fontSize: 11,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: roast.scoreColor.withValues(alpha: 0.18),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: roast.scoreColor.withValues(alpha: 0.45),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RoastDocumentIconButton(roast: roast),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: roast.scoreColor.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: roast.scoreColor.withValues(alpha: 0.45),
+                          ),
+                        ),
+                        child: Text(
+                          '${roast.score}/100',
+                          style: TextStyle(
+                            color: roast.scoreColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      '${roast.score}/100',
-                      style: TextStyle(
-                        color: roast.scoreColor,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    ],
                   ),
                 ],
               ),

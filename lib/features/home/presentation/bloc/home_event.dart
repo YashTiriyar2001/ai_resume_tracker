@@ -11,6 +11,11 @@ final class HomeStarted extends HomeEvent {
   const HomeStarted();
 }
 
+/// Reload roasts from storage (e.g. after a new analysis completes).
+final class HomeRoastsRefreshed extends HomeEvent {
+  const HomeRoastsRefreshed();
+}
+
 final class HomeDisplayNameChanged extends HomeEvent {
   const HomeDisplayNameChanged(this.displayName);
 

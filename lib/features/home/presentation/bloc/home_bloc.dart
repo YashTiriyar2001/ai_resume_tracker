@@ -13,6 +13,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         _roastRepository = roastRepository,
         super(const HomeState()) {
     on<HomeStarted>(_onStarted);
+    on<HomeRoastsRefreshed>(_onRoastsRefreshed);
     on<HomeDisplayNameChanged>(_onDisplayNameChanged);
   }
 
@@ -23,7 +24,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     HomeStarted event,
     Emitter<HomeState> emit,
   ) async {
-    emit(state.copyWith(status: HomeStatus.loading, clearErrorMessage: true));
+    await _loadRoasts(emit, showLoading: state.roasts.isEmpty);
+  }
+
+  Future<void> _onRoastsRefreshed(
+    HomeRoastsRefreshed event,
+    Emitter<HomeState> emit,
+  ) async {
+    await _loadRoasts(emit, showLoading: false);
+  }
+
+  Future<void> _loadRoasts(
+    Emitter<HomeState> emit, {
+    required bool showLoading,
+  }) async {
+    if (showLoading) {
+      emit(state.copyWith(status: HomeStatus.loading, clearErrorMessage: true));
+    }
     try {
       final roasts = await _roastRepository.fetchRoasts();
       emit(
@@ -31,6 +48,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           status: HomeStatus.success,
           displayName: _hiveService.readDisplayName(),
           roasts: roasts,
+          clearErrorMessage: true,
         ),
       );
     } catch (error) {
