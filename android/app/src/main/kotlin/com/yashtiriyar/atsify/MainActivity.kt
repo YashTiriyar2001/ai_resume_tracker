@@ -1,4 +1,4 @@
-package com.example.ai_resume_tracker
+package com.yashtiriyar.atsify
 
 import io.flutter.embedding.android.FlutterActivity
 

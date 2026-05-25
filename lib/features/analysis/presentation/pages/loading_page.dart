@@ -1,11 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../home/presentation/bloc/home_bloc.dart';
@@ -15,10 +13,7 @@ import '../../data/resume_analysis_service.dart';
 import '../../domain/analysis_request.dart';
 
 class LoadingPage extends StatefulWidget {
-  const LoadingPage({
-    required this.request,
-    super.key,
-  });
+  const LoadingPage({required this.request, super.key});
 
   final AnalysisRequest request;
 
@@ -124,10 +119,7 @@ class _LoadingPageState extends State<LoadingPage> {
                   widget.request.fileName,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    color: colors.body,
-                    fontSize: 14,
-                  ),
+                  style: GoogleFonts.inter(color: colors.body, fontSize: 14),
                 ),
                 const SizedBox(height: 20),
                 Expanded(
@@ -145,10 +137,7 @@ class _LoadingPageState extends State<LoadingPage> {
                   Text(
                     _error!,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: errorColor,
-                      fontSize: 14,
-                    ),
+                    style: GoogleFonts.inter(color: errorColor, fontSize: 14),
                   ),
                   const SizedBox(height: 16),
                   FilledButton(
@@ -157,15 +146,18 @@ class _LoadingPageState extends State<LoadingPage> {
                   ),
                 ] else ...[
                   Text(
-                    _thoughts[_thoughtIndex],
-                    key: ValueKey(_thoughtIndex),
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: colors.headline,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.2, end: 0),
+                        _thoughts[_thoughtIndex],
+                        key: ValueKey(_thoughtIndex),
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          color: colors.headline,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: 300.ms)
+                      .slideY(begin: 0.2, end: 0),
                   const SizedBox(height: 20),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
@@ -196,16 +188,16 @@ class _ScanningAnimation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final gifSize = size.width.clamp(260.0, 360.0);
+    final gifSize = size.width.clamp(160.0, 260.0);
 
     return Image.asset(
-      _LoadingPageState._scanGif,
-      width: gifSize,
-      height: gifSize,
-      fit: BoxFit.contain,
-      gaplessPlayback: true,
-      filterQuality: FilterQuality.medium,
-    )
+          _LoadingPageState._scanGif,
+          width: gifSize,
+          height: gifSize,
+          fit: BoxFit.contain,
+          gaplessPlayback: true,
+          filterQuality: FilterQuality.medium,
+        )
         .animate()
         .fadeIn(duration: 450.ms)
         .scale(
